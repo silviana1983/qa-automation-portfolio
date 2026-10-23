@@ -20,3 +20,19 @@ test("user can remove a backpack from the cart", async ({ page }) => {
     page.getByText("Sauce Labs Backpack", { exact: true }),
   ).toHaveCount(0);
 });
+
+test("user can sort products by price from low to high", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+
+  await login(page, "standard_user", "secret_sauce");
+
+  await page.getByRole("combobox").selectOption("lohi");
+
+  const prices = await page.locator(".inventory_item_price").allTextContents();
+
+  const numericPrices = prices.map((price) => Number(price.replace("$", "")));
+
+  const sortedPrices = [...numericPrices].sort((a, b) => a - b);
+
+  expect(numericPrices).toEqual(sortedPrices);
+});
