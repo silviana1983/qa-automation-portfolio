@@ -20,6 +20,18 @@ The goal is to build a maintainable test suite that validates key user-facing be
 - Navigation to the Getting Started page
 - Cross-browser test execution with Chromium, Firefox, and WebKit
 
+## Sauce Demo Test Coverage
+
+The Sauce Demo test suite covers the following scenarios:
+
+- Successful login with valid credentials
+- Login attempt with a locked-out user
+- Adding a product to the shopping cart
+- Verifying the shopping cart item count
+- Verifying that the expected product appears in the cart
+
+The Sauce Demo tests run across Chromium, Firefox, and WebKit.
+
 ## Running the Tests
 
 Install dependencies:
