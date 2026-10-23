@@ -1,14 +1,5 @@
 import { test, expect } from "@playwright/test";
-
-async function login(
-  page: import("@playwright/test").Page,
-  username: string,
-  password: string,
-) {
-  await page.getByPlaceholder("Username").fill(username);
-  await page.getByPlaceholder("Password").fill(password);
-  await page.getByRole("button", { name: "Login" }).click();
-}
+import { login } from "./login-helper";
 
 test("successful login displays the products page", async ({ page }) => {
   await page.goto("https://www.saucedemo.com/");
