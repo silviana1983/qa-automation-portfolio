@@ -35,4 +35,9 @@ test("user can sort products by price from low to high", async ({ page }) => {
   const sortedPrices = [...numericPrices].sort((a, b) => a - b);
 
   expect(numericPrices).toEqual(sortedPrices);
+
+  expect(numericPrices[0]).toBe(Math.min(...numericPrices));
+  expect(numericPrices[numericPrices.length - 1]).toBe(
+    Math.max(...numericPrices),
+  );
 });
