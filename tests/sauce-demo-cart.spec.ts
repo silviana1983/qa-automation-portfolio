@@ -111,3 +111,39 @@ test("cart count remains correct after returning to products", async ({
   await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
   await expect(backpack.getByRole("button", { name: "Remove" })).toBeVisible();
 });
+
+test("user completes the checkout successfully", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+
+  await login(page, "standard_user", "secret_sauce");
+
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+
+  await page.locator(".shopping_cart_link").click();
+
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Checkout" }).click();
+  await page.getByPlaceholder("First Name").fill("Silvia");
+  await page.getByPlaceholder("Last Name").fill("Flores");
+  await page.getByPlaceholder("Zip/Postal Code").fill("680001");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/checkout-step-two\.html/);
+
+  await expect(page.getByText("Payment Information")).toBeVisible();
+
+  await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Finish" }).click();
+
+  await expect(
+    page.getByText("Thank you for your order!", { exact: true }),
+  ).toBeVisible();
+});
