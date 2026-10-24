@@ -60,3 +60,19 @@ test("user cannot log in with an incorrect password", async ({ page }) => {
 
   await expect(page).toHaveURL("https://www.saucedemo.com/");
 });
+
+test("user can log out successfully", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+
+  await login(page, "standard_user", "secret_sauce");
+
+  await expect(page).toHaveURL(/inventory.html/);
+
+  await page.getByRole("button", { name: "Open Menu" }).click();
+
+  await page.getByRole("button", { name: "Logout" }).click();
+
+  await expect(page).toHaveURL("https://www.saucedemo.com/");
+  await expect(page.getByPlaceholder("Username")).toBeVisible();
+  await expect(page.getByPlaceholder("Password")).toBeVisible();
+});
