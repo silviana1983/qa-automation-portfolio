@@ -13,6 +13,13 @@ test("user can remove a backpack from the cart", async ({ page }) => {
   await backpack.getByRole("button", { name: "Add to cart" }).click();
 
   await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Remove" }).click();
 
@@ -60,4 +67,6 @@ test("cart badge displays the correct count for two products", async ({
   await bikeLight.getByRole("button", { name: "Add to cart" }).click();
 
   await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+
+  await page.locator(".shopping_cart_link").click();
 });
