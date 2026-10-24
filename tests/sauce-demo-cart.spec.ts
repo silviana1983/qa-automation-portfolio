@@ -67,4 +67,27 @@ test("cart badge displays the correct count for two products", async ({
   await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
 
   await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
+
+  const backpackInCart = page.locator(".cart_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+
+  await backpackInCart.getByRole("button", { name: "Remove" }).click();
+
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toHaveCount(0);
+
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
 });
