@@ -170,3 +170,21 @@ test("checkout shows an error when first name is missing", async ({ page }) => {
     page.getByText("Error: First Name is required", { exact: true }),
   ).toBeVisible();
 });
+
+test("cart displays the product that was added", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+
+  await login(page, "standard_user", "secret_sauce");
+
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+
+  await page.locator(".shopping_cart_link").click();
+
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+});
