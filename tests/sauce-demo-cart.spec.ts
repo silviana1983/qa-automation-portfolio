@@ -41,3 +41,23 @@ test("user can sort products by price from low to high", async ({ page }) => {
     Math.max(...numericPrices),
   );
 });
+test("cart badge displays the correct count for two products", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+
+  await login(page, "standard_user", "secret_sauce");
+
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+
+  const bikeLight = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Bike Light",
+  });
+
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await bikeLight.getByRole("button", { name: "Add to cart" }).click();
+
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+});
