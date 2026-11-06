@@ -208,3 +208,19 @@ test("cart is empty after removing the product", async ({ page }) => {
 
   await expect(page.locator(".cart_item")).toHaveCount(0);
 });
+
+test("cart badge disappears after removing the only product", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+  await page.locator(".shopping_cart_link").click();
+  await page.getByRole("button", { name: "Remove" }).click();
+  await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+});
