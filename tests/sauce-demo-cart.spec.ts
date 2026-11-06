@@ -416,3 +416,40 @@ test("user can complete checkout after cancelling and restarting it", async ({
     page.getByText("Thank you for your order!", { exact: true }),
   ).toBeVisible();
 });
+
+test("user can complete checkout with multiple products", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  const bikeLight = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Bike Light",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await bikeLight.getByRole("button", { name: "Add to cart" }).click();
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Checkout" }).click();
+  await page.getByPlaceholder("First Name").fill("Silvia");
+  await page.getByPlaceholder("Last Name").fill("Florez");
+  await page.getByPlaceholder("Zip/Postal Code").fill("680001");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/checkout-step-two\.html/);
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Finish" }).click();
+  await expect(
+    page.getByText("Thank you for your order!", { exact: true }),
+  ).toBeVisible();
+});
