@@ -336,6 +336,11 @@ test("user can cancel checkout from the overview page", async ({ page }) => {
   await expect(page).toHaveURL(/checkout-step-two\.html/);
   await page.getByRole("button", { name: "Cancel" }).click();
   await expect(page).toHaveURL(/inventory\.html/);
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByText("Sauce Labs Backpack", { exact: true }),
   ).toBeVisible();
