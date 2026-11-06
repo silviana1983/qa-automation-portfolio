@@ -490,3 +490,41 @@ test("user can verify order summary calculations with multiple products", async 
   await page.getByRole("button", { name: "Finish" }).click();
   await expect(page.getByText("Thank you for your order!")).toBeVisible();
 });
+
+test("user can remove one product from cart while preserving the remaining item", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+
+  const bikeLight = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Bike Light",
+  });
+
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await bikeLight.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeVisible();
+  await page
+    .locator(".cart_item")
+    .filter({
+      hasText: "Sauce Labs Bike Light",
+    })
+    .getByRole("button", { name: "Remove" })
+    .click();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sauce Labs Bike Light", { exact: true }),
+  ).toBeHidden();
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+});
