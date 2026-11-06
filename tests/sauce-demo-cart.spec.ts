@@ -585,3 +585,19 @@ test("user can verify product quantities and item totals in cart", async ({
     "Item total: $39.98",
   );
 });
+
+test("user can view an empty cart without product entries", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page.locator(".shopping_cart_link").click();
+  await expect(page).toHaveURL(/cart\.html/);
+  await expect(page.locator(".cart_item")).toHaveCount(0);
+  await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Continue Shopping" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue Shopping" }).click();
+  await expect(page).toHaveURL(/inventory\.html/);
+});
