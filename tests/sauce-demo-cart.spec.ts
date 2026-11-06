@@ -275,3 +275,28 @@ test("checkout displays an error when postal code is missing", async ({
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByText("Error: Postal Code is required")).toBeVisible();
 });
+
+test("checkout proceeds after correcting missing postal code", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await page.getByRole("button", { name: "Checkout" }).click();
+  await page.getByPlaceholder("First Name").fill("Silvia");
+  await page.getByPlaceholder("Last Name").fill("Florez");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByText("Error: Postal Code is required")).toBeVisible();
+  await page.getByPlaceholder("Zip/Postal Code").fill("680001");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/checkout-step-two\.html/);
+  await expect(page.getByText("Payment Information")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Finish" })).toBeVisible();
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+});
