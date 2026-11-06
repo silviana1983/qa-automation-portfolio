@@ -97,6 +97,8 @@ test("cart count remains correct after returning to products", async ({
 }) => {
   await page.goto("https://www.saucedemo.com/");
   await login(page, "standard_user", "secret_sauce");
+
+  await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
   const backpack = page.locator(".inventory_item").filter({
     hasText: "Sauce Labs Backpack",
   });
