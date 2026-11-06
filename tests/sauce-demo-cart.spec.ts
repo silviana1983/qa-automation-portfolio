@@ -319,3 +319,24 @@ test("user can cancel checkout and return to the cart", async ({ page }) => {
     page.getByText("Sauce Labs Backpack", { exact: true }),
   ).toBeVisible();
 });
+
+test("user can cancel checkout from the overview page", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await page.getByRole("button", { name: "Checkout" }).click();
+  await page.getByPlaceholder("First Name").fill("Silvia");
+  await page.getByPlaceholder("Last Name").fill("Florez");
+  await page.getByPlaceholder("Zip/Postal Code").fill("680001");
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page).toHaveURL(/checkout-step-two\.html/);
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await expect(page).toHaveURL(/inventory\.html/);
+  await expect(
+    page.getByText("Sauce Labs Backpack", { exact: true }),
+  ).toBeVisible();
+});
