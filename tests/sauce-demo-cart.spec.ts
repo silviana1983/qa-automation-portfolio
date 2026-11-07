@@ -632,3 +632,27 @@ test("user can remove the last product and view an empty cart", async ({
   await page.getByRole("button", { name: "Continue Shopping" }).click();
   await expect(page).toHaveURL(/inventory\.html/);
 });
+
+test("user can preserve cart contents after refreshing the cart page", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Backpack",
+    }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Backpack",
+    }),
+  ).toBeVisible();
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
+});
