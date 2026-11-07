@@ -50,3 +50,23 @@ test("user can sort products by name from Z to A", async ({ page }) => {
     [...displayedNames].sort((a, b) => b.localeCompare(a)),
   );
 });
+
+test("user can view product descriptions and prices", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const productDescriptions = page.locator(".inventory_item_desc");
+
+  await expect(productDescriptions.first()).toBeVisible();
+
+  const displayedDescriptions = await productDescriptions.allTextContents();
+  expect(displayedDescriptions.length).toBeGreaterThan(0);
+  expect(
+    displayedDescriptions.every((description) => description.trim().length > 0),
+  ).toBe(true);
+  const productPrices = page.locator(".inventory_item_price");
+  const displayedPrices = await productPrices.allTextContents();
+  expect(displayedPrices.length).toBeGreaterThan(0);
+  expect(
+    displayedPrices.every((price) => /^\$\d+\.\d{2}$/.test(price.trim())),
+  ).toBe(true);
+});
