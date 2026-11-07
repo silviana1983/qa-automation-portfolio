@@ -656,3 +656,37 @@ test("user can preserve cart contents after refreshing the cart page", async ({
   ).toBeVisible();
   await expect(page.locator(".shopping_cart_badge")).toHaveText("1");
 });
+
+test("user can continue shopping without losing existing cart contents", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Backpack",
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue Shopping" }).click();
+  const bikeLight = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Bike Light",
+  });
+  await bikeLight.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Backpack",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Bike Light",
+    }),
+  ).toBeVisible();
+  await expect(page.locator(".shopping_cart_badge")).toHaveText("2");
+});
