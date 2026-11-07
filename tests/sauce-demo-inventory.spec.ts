@@ -133,3 +133,23 @@ test("each inventory product displays a visible product image", async ({
   );
   expect(loadedImages.every((isLoaded) => isLoaded)).toBe(true);
 });
+
+test("user can open a product detail page", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const productNames = page.locator(".inventory_item_name");
+  const firstProduct = productNames.first();
+  await expect(firstProduct).toBeVisible();
+  await firstProduct.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const productDetailName = page.locator(".inventory_details_name");
+  await expect(productDetailName).toBeVisible();
+  const productDetailDescription = page.locator(".inventory_details_desc");
+  await expect(productDetailDescription).toBeVisible();
+  const productDetailPrice = page.locator(".inventory_details_price");
+  await expect(productDetailPrice).toBeVisible();
+  const backButton = page.locator(".inventory_details_back_button");
+  await expect(backButton).toBeVisible();
+  await backButton.click();
+  await expect(page).toHaveURL(/inventory\.html/);
+});
