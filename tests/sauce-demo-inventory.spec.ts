@@ -70,3 +70,35 @@ test("user can view product descriptions and prices", async ({ page }) => {
     displayedPrices.every((price) => /^\$\d+\.\d{2}$/.test(price.trim())),
   ).toBe(true);
 });
+
+test("each inventory product displays complete product information", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const productCards = page.locator(".inventory_item");
+  await expect(productCards.first()).toBeVisible();
+  const productCount = await productCards.count();
+  expect(productCount).toBeGreaterThan(0);
+  const productNames = productCards.locator(".inventory_item_name");
+  const displayedNames = await productNames.allTextContents();
+  expect(displayedNames.length).toBe(productCount);
+  expect(displayedNames.every((name) => name.trim().length > 0)).toBe(true);
+  const productDescriptions = productCards.locator(".inventory_item_desc");
+  const displayedDescriptions = await productDescriptions.allTextContents();
+  expect(displayedDescriptions.length).toBe(productCount);
+  expect(
+    displayedDescriptions.every((description) => description.trim().length > 0),
+  ).toBe(true);
+  const productPrices = productCards.locator(".inventory_item_price");
+  const displayedPrices = await productPrices.allTextContents();
+  expect(displayedPrices.length).toBe(productCount);
+  expect(
+    displayedPrices.every((price) => /^\$\d+\.\d{2}$/.test(price.trim())),
+  ).toBe(true);
+  const productButtons = productCards.locator("button");
+  expect(await productButtons.count()).toBe(productCount);
+  const buttonLabels = await productButtons.allTextContents();
+  expect(buttonLabels.length).toBe(productCount);
+  expect(buttonLabels.every((label) => label.trim().length > 0)).toBe(true);
+});
