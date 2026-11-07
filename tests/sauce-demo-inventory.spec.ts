@@ -182,3 +182,26 @@ test("product detail information matches the selected inventory item", async ({
   const productDetailPrice = page.locator(".inventory_details_price");
   await expect(productDetailPrice).toHaveText(inventoryPrice!);
 });
+
+test("product detail image matches the selected inventory item", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProductCard = page.locator(".inventory_item").first();
+  await expect(firstProductCard).toBeVisible();
+  const inventoryProductImage = firstProductCard.locator(
+    ".inventory_item_img img",
+  );
+  await expect(inventoryProductImage).toBeVisible();
+  const inventoryImageSource = await inventoryProductImage.getAttribute("src");
+  expect(inventoryImageSource).toBeTruthy();
+  const inventoryProductName = firstProductCard.locator(".inventory_item_name");
+  await inventoryProductName.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const productDetailImage = page.locator(".inventory_details_img");
+  await expect(productDetailImage).toBeVisible();
+  const productDetailImageSource = await productDetailImage.getAttribute("src");
+  expect(productDetailImageSource).toBeTruthy();
+  expect(productDetailImageSource).toBe(inventoryImageSource);
+});
