@@ -153,3 +153,32 @@ test("user can open a product detail page", async ({ page }) => {
   await backButton.click();
   await expect(page).toHaveURL(/inventory\.html/);
 });
+
+test("product detail information matches the selected inventory item", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProductCard = page.locator(".inventory_item").first();
+  await expect(firstProductCard).toBeVisible();
+  const inventoryProductName = firstProductCard.locator(".inventory_item_name");
+  const inventoryName = (await inventoryProductName.textContent())?.trim();
+  const inventoryProductDescription = firstProductCard.locator(
+    ".inventory_item_desc",
+  );
+  const inventoryDescription = (
+    await inventoryProductDescription.textContent()
+  )?.trim();
+  const inventoryProductPrice = firstProductCard.locator(
+    ".inventory_item_price",
+  );
+  const inventoryPrice = (await inventoryProductPrice.textContent())?.trim();
+  await inventoryProductName.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const productDetailName = page.locator(".inventory_details_name");
+  await expect(productDetailName).toHaveText(inventoryName!);
+  const productDetailDescription = page.locator(".inventory_details_desc");
+  await expect(productDetailDescription).toHaveText(inventoryDescription!);
+  const productDetailPrice = page.locator(".inventory_details_price");
+  await expect(productDetailPrice).toHaveText(inventoryPrice!);
+});
