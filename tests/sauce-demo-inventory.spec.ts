@@ -38,3 +38,15 @@ test("user can sort products by name from A to Z", async ({ page }) => {
     [...displayedNames].sort((a, b) => a.localeCompare(b)),
   );
 });
+
+test("user can sort products by name from Z to A", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const productNames = page.locator(".inventory_item_name");
+  await page.locator(".product_sort_container").selectOption("za");
+  const displayedNames = await productNames.allTextContents();
+  expect(displayedNames.length).toBeGreaterThan(0);
+  expect(displayedNames).toEqual(
+    [...displayedNames].sort((a, b) => b.localeCompare(a)),
+  );
+});
