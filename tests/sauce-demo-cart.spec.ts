@@ -601,3 +601,34 @@ test("user can view an empty cart without product entries", async ({
   await page.getByRole("button", { name: "Continue Shopping" }).click();
   await expect(page).toHaveURL(/inventory\.html/);
 });
+
+test("user can remove the last product and view an empty cart", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const backpack = page.locator(".inventory_item").filter({
+    hasText: "Sauce Labs Backpack",
+  });
+  await backpack.getByRole("button", { name: "Add to cart" }).click();
+  await page.locator(".shopping_cart_link").click();
+  await expect(
+    page.locator(".cart_item").filter({
+      hasText: "Sauce Labs Backpack",
+    }),
+  ).toBeVisible();
+  await page
+    .locator(".cart_item")
+    .filter({
+      hasText: "Sauce Labs Backpack",
+    })
+    .getByRole("button", { name: "Remove" })
+    .click();
+  await expect(page.locator(".cart_item")).toHaveCount(0);
+  await expect(page.locator(".shopping_cart_badge")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Continue Shopping" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Continue Shopping" }).click();
+  await expect(page).toHaveURL(/inventory\.html/);
+});
