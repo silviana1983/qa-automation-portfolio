@@ -102,3 +102,34 @@ test("each inventory product displays complete product information", async ({
   expect(buttonLabels.length).toBe(productCount);
   expect(buttonLabels.every((label) => label.trim().length > 0)).toBe(true);
 });
+
+test("each inventory product displays a visible product image", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const productCards = page.locator(".inventory_item");
+  await expect(productCards.first()).toBeVisible();
+  const productImages = productCards.locator(".inventory_item_img img");
+  const imageCount = await productImages.count();
+  expect(imageCount).toBe(await productCards.count());
+  await expect(productImages.first()).toBeVisible();
+  const imageSources = await productImages.evaluateAll((images) =>
+    images.map((image) => image.getAttribute("src")),
+  );
+  expect(
+    imageSources.every((source) => source !== null && source.trim().length > 0),
+  ).toBe(true);
+  await expect
+    .poll(async () =>
+      productImages.evaluateAll((images) =>
+        images.every((image) => (image as HTMLImageElement).complete),
+      ),
+    )
+    .toBe(true);
+
+  const loadedImages = await productImages.evaluateAll((images) =>
+    images.map((image) => (image as HTMLImageElement).naturalWidth > 0),
+  );
+  expect(loadedImages.every((isLoaded) => isLoaded)).toBe(true);
+});
