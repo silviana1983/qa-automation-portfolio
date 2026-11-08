@@ -300,3 +300,22 @@ test("user can return to inventory from a product detail page", async ({
   await backToProductsButton.click();
   await expect(page).toHaveURL(/inventory\.html/);
 });
+
+test("product remains available after returning from its detail page", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProduct = page.locator(".inventory_item").first();
+  await expect(firstProduct).toBeVisible();
+  const productName = await firstProduct
+    .locator(".inventory_item_name")
+    .textContent();
+  await firstProduct.locator(".inventory_item_name").click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  await page.locator("#back-to-products").click();
+  await expect(page).toHaveURL(/inventory\.html/);
+  await expect(
+    page.locator(".inventory_item_name", { hasText: productName ?? "" }),
+  ).toBeVisible();
+});
