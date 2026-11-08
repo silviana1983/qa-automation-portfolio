@@ -259,3 +259,28 @@ test("user can remove a product from the cart on its detail page", async ({
   await expect(addToCartButton).toHaveText("Add to cart");
   await expect(cartBadge).toBeHidden();
 });
+
+test("cart remains empty after removing a product from its detail page", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProductCard = page.locator(".inventory_item").first();
+  await expect(firstProductCard).toBeVisible();
+  const inventoryProductName = firstProductCard.locator(".inventory_item_name");
+  await inventoryProductName.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const addToCartButton = page.locator(".inventory_details .btn_inventory");
+  await expect(addToCartButton).toBeVisible();
+  await addToCartButton.click();
+  await expect(addToCartButton).toHaveText("Remove");
+  const cartBadge = page.locator(".shopping_cart_badge");
+  await expect(cartBadge).toBeVisible();
+  await expect(cartBadge).toHaveText("1");
+  await addToCartButton.click();
+  await expect(addToCartButton).toHaveText("Add to cart");
+  await expect(cartBadge).toBeHidden();
+  await page.locator(".shopping_cart_link").click();
+  await expect(page).toHaveURL(/cart\.html/);
+  await expect(page.locator(".cart_item")).toHaveCount(0);
+});
