@@ -284,3 +284,19 @@ test("cart remains empty after removing a product from its detail page", async (
   await expect(page).toHaveURL(/cart\.html/);
   await expect(page.locator(".cart_item")).toHaveCount(0);
 });
+
+test("user can return to inventory from a product detail page", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProductCard = page.locator(".inventory_item").first();
+  await expect(firstProductCard).toBeVisible();
+  const inventoryProductName = firstProductCard.locator(".inventory_item_name");
+  await inventoryProductName.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const backToProductsButton = page.locator("#back-to-products");
+  await expect(backToProductsButton).toBeVisible();
+  await backToProductsButton.click();
+  await expect(page).toHaveURL(/inventory\.html/);
+});
