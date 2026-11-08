@@ -370,3 +370,19 @@ test("browser back button returns to inventory from product details", async ({
   await expect(page).toHaveURL(/inventory\.html/);
   await expect(page.locator(".inventory_item")).toHaveCount(6);
 });
+
+test("browser forward button returns to product details", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page
+    .locator(".inventory_item")
+    .first()
+    .locator(".inventory_item_name")
+    .click();
+
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  await page.goBack();
+  await expect(page).toHaveURL(/inventory\.html/);
+  await page.goForward();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+});
