@@ -319,3 +319,18 @@ test("product remains available after returning from its detail page", async ({
     page.locator(".inventory_item_name", { hasText: productName ?? "" }),
   ).toBeVisible();
 });
+
+test("user can open a different product detail page", async ({ page }) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const selectedProduct = page.locator(".inventory_item").nth(1);
+  await expect(selectedProduct).toBeVisible();
+  const selectedProductName = await selectedProduct
+    .locator(".inventory_item_name")
+    .textContent();
+  await selectedProduct.locator(".inventory_item_name").click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  await expect(page.locator(".inventory_details_name")).toHaveText(
+    selectedProductName ?? "",
+  );
+});
