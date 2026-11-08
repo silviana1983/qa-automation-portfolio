@@ -233,3 +233,29 @@ test("user can add a product to the cart from its detail page", async ({
   await expect(cartProductName).toBeVisible();
   await expect(cartProductName).toHaveText(selectedProductName!);
 });
+
+test("user can remove a product from the cart on its detail page", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const firstProductCard = page.locator(".inventory_item").first();
+  await expect(firstProductCard).toBeVisible();
+  const inventoryProductName = firstProductCard.locator(".inventory_item_name");
+  const selectedProductName = (
+    await inventoryProductName.textContent()
+  )?.trim();
+  await inventoryProductName.click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  const addToCartButton = page.locator(".inventory_details .btn_inventory");
+  await expect(addToCartButton).toBeVisible();
+  await expect(addToCartButton).toHaveText("Add to cart");
+  await addToCartButton.click();
+  await expect(addToCartButton).toHaveText("Remove");
+  const cartBadge = page.locator(".shopping_cart_badge");
+  await expect(cartBadge).toBeVisible();
+  await expect(cartBadge).toHaveText("1");
+  await addToCartButton.click();
+  await expect(addToCartButton).toHaveText("Add to cart");
+  await expect(cartBadge).toBeHidden();
+});
