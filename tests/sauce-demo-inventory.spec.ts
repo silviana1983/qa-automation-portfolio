@@ -334,3 +334,23 @@ test("user can open a different product detail page", async ({ page }) => {
     selectedProductName ?? "",
   );
 });
+
+test("product details remain available after page refresh", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  const selectedProduct = page.locator(".inventory_item").first();
+  const productName = await selectedProduct
+    .locator(".inventory_item_name")
+    .textContent();
+  await selectedProduct.locator(".inventory_item_name").click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  await expect(page.locator(".inventory_details_name")).toHaveText(
+    productName ?? "",
+  );
+  await page.reload();
+  await expect(page.locator(".inventory_details_name")).toHaveText(
+    productName ?? "",
+  );
+});
