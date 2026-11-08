@@ -405,3 +405,33 @@ test("browser forward restores the selected product details", async ({
     productName ?? "",
   );
 });
+
+test("inventory sorting remains consistent after browser back navigation", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page.locator(".product_sort_container").selectOption("lohi");
+  const selectedProduct = page.locator(".inventory_item").first();
+  const productName = await selectedProduct
+    .locator(".inventory_item_name")
+    .textContent();
+  await selectedProduct.locator(".inventory_item_name").click();
+  await expect(page).toHaveURL(/inventory-item\.html/);
+  await page.goBack();
+  await expect(page).toHaveURL(/inventory\.html/);
+  const sortingOption = await page
+    .locator(".product_sort_container")
+    .inputValue();
+
+  if (sortingOption === "lohi") {
+    await expect(page.locator(".inventory_item_name").first()).toHaveText(
+      "Sauce Labs Onesie",
+    );
+  } else {
+    await expect(page.locator(".product_sort_container")).toHaveValue("az");
+    await expect(page.locator(".inventory_item_name").first()).toHaveText(
+      "Sauce Labs Backpack",
+    );
+  }
+});
