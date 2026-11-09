@@ -435,3 +435,20 @@ test("inventory sorting remains consistent after browser back navigation", async
     );
   }
 });
+
+test("user can restore alphabetical inventory sorting after sorting by price", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page.locator(".product_sort_container").selectOption("lohi");
+  await expect(page.locator(".product_sort_container")).toHaveValue("lohi");
+  await page.locator(".product_sort_container").selectOption("az");
+  await expect(page.locator(".product_sort_container")).toHaveValue("az");
+  await expect(page.locator(".inventory_item_name").first()).toHaveText(
+    "Sauce Labs Backpack",
+  );
+  await expect(page.locator(".inventory_item_name").nth(1)).toHaveText(
+    "Sauce Labs Bike Light",
+  );
+});
