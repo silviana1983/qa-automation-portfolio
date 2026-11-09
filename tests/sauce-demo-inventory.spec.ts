@@ -463,3 +463,19 @@ test("inventory sorting remains selected after page refresh", async ({
   await page.reload();
   await expect(page.locator(".product_sort_container")).toHaveValue("az");
 });
+
+test("inventory products return to alphabetical order after page refresh", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page.locator(".product_sort_container").selectOption("lohi");
+  await expect(page.locator(".product_sort_container")).toHaveValue("lohi");
+  await page.reload();
+  await expect(page.locator(".inventory_item_name").first()).toHaveText(
+    "Sauce Labs Backpack",
+  );
+  await expect(page.locator(".inventory_item_name").nth(1)).toHaveText(
+    "Sauce Labs Bike Light",
+  );
+});
