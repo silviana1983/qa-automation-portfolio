@@ -452,3 +452,14 @@ test("user can restore alphabetical inventory sorting after sorting by price", a
     "Sauce Labs Bike Light",
   );
 });
+
+test("inventory sorting remains selected after page refresh", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await login(page, "standard_user", "secret_sauce");
+  await page.locator(".product_sort_container").selectOption("lohi");
+  await expect(page.locator(".product_sort_container")).toHaveValue("lohi");
+  await page.reload();
+  await expect(page.locator(".product_sort_container")).toHaveValue("az");
+});
